@@ -1,11 +1,8 @@
-from cgi import test
 import torch
 import torch.nn as nn
 import torch.nn.functional as func
 import pandas as pd
 import numpy as np
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader2 as DataLoader
 
 
 device = torch.device('cpu')
@@ -43,8 +40,8 @@ class Net(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.l1 = nn.Linear(279, 256)
-        self.l2 = nn.Linear(256, 128)
-        self.l3 = nn.Linear(128, 8)
+        self.l2 = nn.Linear(256, 64)
+        self.l3 = nn.Linear(64, 8)
         # self.l1 = nn.Linear(279, 100)
         # self.l2 = nn.Linear(100, 100)
         # self.l3 = nn.Linear(100, 8)
@@ -59,12 +56,9 @@ class Net(nn.Module):
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
-    '/home/yukimura/Workplace/new_model_weights.pth'))
-# net.load_state_dict(torch.load(
-#     '/home/yukimura/Workplace/model_weights.pth'))
+    '/home/yukimura/Workplace/NSYSU/Datamining/Final/models/256_64acc83.pth'))
 net.eval()
-# criterion = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(net.parameters())
+
 correct = 0
 total = test_data.shape[0]
 test_data = prepocess(train_data, test_data)
@@ -77,8 +71,6 @@ for i in range(len(test_data)):
         total -= 1
     elif test_label[i] == int(idx+1):
         correct += 1
-    # if test_label[i] == int(idx+1):
-    #     correct += 1
 
 print(f'correct: {correct}')
 print(

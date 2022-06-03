@@ -89,6 +89,6 @@ for i in range(EPOCH):
 
         optimizer.step()
         running_loss += loss.item()
-    print(f'[{i + 1}, {j + 1:5d}] loss: {running_loss / 2000:.3f}')
+    print(f'[{i + 1}, {j + 1:5d}] loss: {running_loss / (j+1):.3f}')
     running_loss = 0.0
 torch.save(net.state_dict(), 'new_model_weights.pth')
