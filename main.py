@@ -6,7 +6,7 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader2 as DataLoader
 
-EPOCH = 5
+EPOCH = 4
 
 device = torch.device('cpu')
 
@@ -24,7 +24,6 @@ def prepocess(arr: np.ndarray):
     for col in arr:
         std = np.nanstd(col)
         mean = np.nanmean(col)
-        #print(f'std:{std} mean:{mean}')
         for i in range(len(col)):
             col[i] = (col[i]-mean) / \
                 std if std != 0 and not np.isnan(col[i]) else 0
@@ -47,6 +46,22 @@ class TrainSet(Dataset):
         return self.length
 
 
+class Net(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.l1 = nn.Linear(279, 256)
+        self.l2 = nn.Linear(256, 64)
+        self.l3 = nn.Linear(64, 8)
+
+    def forward(self, x: torch.Tensor):
+        x = func.relu(self.l1(x))
+        x = func.relu(self.l2(x))
+
+        # with softmax
+        # return func.softmax(self.l3(x), dim=-1)
+        return self.l3(x)
+
+
 train_data = prepocess(train_data)
 trainset = TrainSet()
 
@@ -54,30 +69,13 @@ trainloader = DataLoader(dataset=trainset, batch_size=4, shuffle=True)
 dataiter = iter(trainloader)
 data = dataiter.next()
 
-
-class Net(nn.Module):
-    def __init__(self) -> None:
-        super().__init__()
-        self.l1 = nn.Linear(279, 256)
-        self.l2 = nn.Linear(256, 128)
-        self.l3 = nn.Linear(128, 8)
-        # self.l1 = nn.Linear(279, 100)
-        # self.l2 = nn.Linear(100, 100)
-        # self.l3 = nn.Linear(100, 8)
-
-    def forward(self, x: torch.Tensor):
-        # for p in self.l1.parameters():
-        #     print(p)
-        x = func.relu(self.l1(x))
-        x = func.relu(self.l2(x))
-        return self.l3(x)
-
-
 net = Net().to(device)
+
+# with softmax
+#criterion = nn.NLLLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(net.parameters())
 
-train_data = prepocess(train_data)
 for i in range(EPOCH):
     running_loss = 0.0
     for j, data in enumerate(trainloader, 0):
@@ -89,6 +87,6 @@ for i in range(EPOCH):
 
         optimizer.step()
         running_loss += loss.item()
-    print(f'[{i + 1}, {j + 1:5d}] loss: {running_loss / (j+1):.3f}')
+    print(f'[{i + 1}/ {EPOCH}] loss: {running_loss / (j+1):.3f}')
     running_loss = 0.0
 torch.save(net.state_dict(), 'new_model_weights.pth')

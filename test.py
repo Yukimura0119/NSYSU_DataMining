@@ -42,21 +42,18 @@ class Net(nn.Module):
         self.l1 = nn.Linear(279, 256)
         self.l2 = nn.Linear(256, 64)
         self.l3 = nn.Linear(64, 8)
-        # self.l1 = nn.Linear(279, 100)
-        # self.l2 = nn.Linear(100, 100)
-        # self.l3 = nn.Linear(100, 8)
 
     def forward(self, x: torch.Tensor):
-        # for p in self.l1.parameters():
-        #     print(p)
         x = func.relu(self.l1(x))
         x = func.relu(self.l2(x))
+        # with softmax
+        # return func.softmax(self.l3(x), dim=-1)
         return self.l3(x)
 
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
-    '/home/yukimura/Workplace/NSYSU/Datamining/Final/models/256_64acc83.pth'))
+    '/home/yukimura/Workplace/NSYSU/Datamining/Final/new_model_weights.pth'))
 net.eval()
 
 correct = 0
