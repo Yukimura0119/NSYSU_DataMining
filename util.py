@@ -24,3 +24,9 @@ def prepocess(arr: np.ndarray):
             col[i] = (col[i]-mean) / \
                 std if std != 0 and not np.isnan(col[i]) else 0
     return arr.T
+
+def replace_train_label(train_label):
+    train_label[train_label == 'KIRC'] = 0
+    train_label[train_label == 'BRCA'] = 1
+    train_label[train_label == 'LUAD'] = 2
+    return np.squeeze(train_label.astype(np.int32))
