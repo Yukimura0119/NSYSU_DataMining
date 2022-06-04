@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader2 as DataLoader
+from util import *
 
 EPOCH = 4
 
@@ -17,18 +18,6 @@ train_label = pd.read_csv(
 
 train_data = np.array(train_data)
 train_label = np.array(train_label)
-
-
-def prepocess(arr: np.ndarray):
-    arr = arr.T
-    for col in arr:
-        std = np.nanstd(col)
-        mean = np.nanmean(col)
-        for i in range(len(col)):
-            col[i] = (col[i]-mean) / \
-                std if std != 0 and not np.isnan(col[i]) else 0
-    return arr.T
-
 
 class TrainSet(Dataset):
     def __init__(self) -> None:
