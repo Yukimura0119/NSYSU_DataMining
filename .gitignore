@@ -9,3 +9,9 @@ __pycache__/
 .gitattributes
 .vscode
 /Arrhythmia_DataSet
+<<<<<<< HEAD
+/Gene_Expression_DataSet
+new_model_weights*
+ds2*
+=======
+>>>>>>> 05e2ce0c39299bd925d215f91c17e66f41c434ff

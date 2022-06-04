@@ -2,13 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from util import *
+from Util.util import *
 from collections import Counter
 from sklearn.cluster import DBSCAN
 from pandas.plotting import scatter_matrix
 
 absFilePath = os.path.abspath(__file__)
-os.chdir( os.path.dirname(absFilePath))
+os.chdir(os.path.dirname(absFilePath))
 PICK = 8
 PATH1 = './Arrhythmia_DataSet/train_data.csv'
 PATH2 = './Arrhythmia_DataSet/train_label.csv'

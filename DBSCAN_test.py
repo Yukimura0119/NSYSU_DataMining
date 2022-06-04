@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from util import *
+from Util.util import *
 from sklearn.cluster import DBSCAN
 from collections import Counter
 from pandas.plotting import scatter_matrix
