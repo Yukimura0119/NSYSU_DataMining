@@ -5,9 +5,9 @@ UNCLASSIFIED = False
 NOISE = None
 
 def _dist(p,q):
-	return math.sqrt(np.power(p-q,2).sum())
+	return math.sqrt(np.power(p-q, 2).sum())
 
-def _eps_neighborhood(p,q,eps):
+def _eps_neighborhood(p, q, eps):
 	return _dist(p,q) < eps
 
 def _region_query(m, point_id, eps):
