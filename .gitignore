@@ -1,0 +1,13 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.exe
+*.lnk
+#.gitignore
+.gitattributes
+.vscode
+/Gene_Expression_DataSet
+new_model_weights*
+ds2*
