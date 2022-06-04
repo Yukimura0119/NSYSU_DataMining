@@ -27,3 +27,10 @@ def prepocess(arr: np.ndarray, stds: np.ndarray, means: np.ndarray):
                 stds[cnt] if stds[cnt] != 0 and not np.isnan(col[i]) else 0
         cnt += 1
     return arr.T
+
+
+def replace_train_label(train_label):
+    train_label[train_label == 'KIRC'] = 0
+    train_label[train_label == 'BRCA'] = 1
+    train_label[train_label == 'LUAD'] = 2
+    return np.squeeze(train_label.astype(np.int32))
