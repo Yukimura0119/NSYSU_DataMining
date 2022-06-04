@@ -10,14 +10,14 @@ from Util.util import *
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
-PICK = 8
-PATH1 = './Arrhythmia_DataSet/train_data.csv'
-PATH2 = './Arrhythmia_DataSet/train_label.csv'
+PICK = 32
+PATH1 = './Gene_Expression_DataSet/train_data.csv'
+PATH2 = './Gene_Expression_DataSet/train_label.csv'
 RESULT = './result/'
 
 trn_data, _ = splitResult(PATH1)
 trn_labl, _ = splitResult(PATH2, dtype=str)
-trn_labl = replace_train_label(trn_labl)
+trn_labl = replace_data_label(trn_labl)
 
 s = np.std(trn_data, axis=0)
 idx = np.argpartition(s, -PICK)[-PICK:]

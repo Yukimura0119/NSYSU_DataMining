@@ -29,8 +29,10 @@ def prepocess(arr: np.ndarray, stds: np.ndarray, means: np.ndarray):
     return arr.T
 
 
-def replace_train_label(train_label):
-    train_label[train_label == 'KIRC'] = 0
-    train_label[train_label == 'BRCA'] = 1
-    train_label[train_label == 'LUAD'] = 2
-    return np.squeeze(train_label.astype(np.int32))
+def replace_data_label(data):
+    data[data == 'KIRC'] = 0
+    data[data == 'BRCA'] = 1
+    data[data == 'LUAD'] = 2
+    data[data == 'PRAD'] = 3
+    data[data == 'COAD'] = 4
+    return np.squeeze(data.astype(np.int32))
