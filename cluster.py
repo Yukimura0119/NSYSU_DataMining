@@ -2,24 +2,17 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from Util.util import *
 from collections import Counter
 from sklearn.cluster import DBSCAN
 from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
 from pandas.plotting import scatter_matrix
+from Util.util import *
 
 absFilePath = os.path.abspath(__file__)
-<<<<<<< HEAD
-os.chdir( os.path.dirname(absFilePath))
-PICK = 32
-PATH1 = './Gene_Expression_DataSet/train_data.csv'
-PATH2 = './Gene_Expression_DataSet/train_label.csv'
-=======
 os.chdir(os.path.dirname(absFilePath))
 PICK = 8
 PATH1 = './Arrhythmia_DataSet/train_data.csv'
 PATH2 = './Arrhythmia_DataSet/train_label.csv'
->>>>>>> main
 RESULT = './result/'
 
 trn_data, _ = splitResult(PATH1)
@@ -42,4 +35,4 @@ uniques, counts = np.unique(trn_labl, return_counts=True)
 print(dict(zip(uniques, counts)))
 print(Counter(labels))
 #scatter_matrix(pd.DataFrame(trn_data, columns=[f'gene_{i}' for i in idx]))
-#plt.show()
+# plt.show()
