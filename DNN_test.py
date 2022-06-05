@@ -8,7 +8,7 @@ from Util.util import prepocess
 from dbscan import *
 
 EPS = 1E-16
-STANDARD = 0.45
+STANDARD = 0.6
 DIM, RADIUS, MINP = 16, 70, 8
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -101,12 +101,12 @@ plt.show()
 #     writer.writerow(uncertain)
 
 # feature sel by largest std
-idx = np.argpartition(stds, -DIM)[-DIM:]
-inputData = test_data[np.ix_(uncertain, idx)]
-true_labels = np.squeeze(test_label[uncertain])
-print(inputData.shape)
-u_labels = myDBSCAN(inputData, RADIUS, MINP)
+# idx = np.argpartition(stds, -DIM)[-DIM:]
+# inputData = test_data[np.ix_(uncertain, idx)]
+# true_labels = np.squeeze(test_label[uncertain])
+# print(inputData.shape)
+# u_labels = myDBSCAN(inputData, RADIUS, MINP)
 
-print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
-print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
-print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))
+# print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
+# print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
+# print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))

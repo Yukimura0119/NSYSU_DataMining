@@ -23,7 +23,7 @@ tst_labl, _ = splitResult('./Gene_Expression_DataSet/test_label.csv', dtype=str)
 tst_labl = replace_data_label(tst_labl)
 
 true_labels = np.squeeze(tst_labl[uncertain])
-
+# feature sel by largest std
 idx = np.argpartition(stds, -DIM)[-DIM:]
 tst_data = tst_data[np.ix_(uncertain, idx)]
 inputData = prepocess(tst_data, stds, means)
@@ -35,7 +35,7 @@ print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
 print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
 print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))
 
-print(Counter(u_labels))
+print('DBSCAN label: ', dict(Counter(u_labels)))
 uniques, counts = np.unique(true_labels, return_counts=True)
 print('Ground truth: ', dict(zip(uniques, counts)))
-#print(np.dstack((u_labels, true_labels)))
+print(u_labels, true_labels)
