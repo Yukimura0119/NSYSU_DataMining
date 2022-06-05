@@ -9,7 +9,7 @@ from dbscan import *
 
 EPS = 1E-16
 STANDARD = 0.45
-
+DIM, RADIUS, MINP = 16, 70, 8
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 absFilePath = os.path.abspath(__file__)
@@ -29,7 +29,7 @@ test_label = pd.read_csv(
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
-    './models/new_model_weights.pth'))
+    './models/ds2_acc99.pth'))
 net.eval()
 
 test_data = test_data.drop(columns=['id'])
@@ -93,11 +93,20 @@ print(
     f'Accuracy(no unknown class): {100 * correct // total} %')
 print(
     f'Recall(for unknown class): {100*true_predict/(test_data.shape[0]-total):.4f} %')
-print(f'Accuracy(for unknown class):{100*true_predict/all_predict:.4f} %')
-#plt.show()
+print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
+plt.show()
 
-u_labels = myDBSCAN(test_data[uncertain])
-true_labels = test_label[uncertain]
+# with open('./uncertain.csv', 'w', newline='') as csvfile:
+#     writer = csv.writer(csvfile)
+#     writer.writerow(uncertain)
+
+# feature sel by largest std
+idx = np.argpartition(stds, -DIM)[-DIM:]
+inputData = test_data[np.ix_(uncertain, idx)]
+true_labels = np.squeeze(test_label[uncertain])
+print(inputData.shape)
+u_labels = myDBSCAN(inputData, RADIUS, MINP)
+
 print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
 print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
 print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))

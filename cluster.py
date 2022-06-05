@@ -11,7 +11,7 @@ from dbscan import *
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
-PICK, EPS = 20, 60
+DIM, EPS = 20, 60
 PATH1 = './Gene_Expression_DataSet/train_data.csv'
 PATH2 = './Gene_Expression_DataSet/train_label.csv'
 RESULT = './result/'
@@ -24,7 +24,7 @@ trn_labl = replace_data_label(trn_labl)
 stds = np.array(std_mean['std'])
 means = np.array(std_mean['mean'])
 
-idx = np.argpartition(stds, -PICK)[-PICK:]
+idx = np.argpartition(stds, -DIM)[-DIM:]
 trn_data = trn_data[:, idx]
 trn_data = prepocess(trn_data, stds, means)
 print(trn_data.shape)
@@ -48,4 +48,3 @@ print('Ground truth: ', dict(zip(uniques, counts)))
 
 # scatter_matrix(pd.DataFrame(trn_data, columns=[f'gene_{i}' for i in idx]))
 # plt.show()
-
