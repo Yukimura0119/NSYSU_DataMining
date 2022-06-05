@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from Network import Net
 from Util.util import prepocess
+from dbscan import *
 
 EPS = 1E-16
 STANDARD = 0.45
@@ -60,6 +61,7 @@ all_predict = 0
 correct = 0
 total = test_data.shape[0]
 test_data = prepocess(test_data, stds, means)
+uncertain = []
 for i in range(len(test_data)):
     result = net(torch.tensor(
         test_data[i], device=device, dtype=torch.float32))
@@ -74,6 +76,7 @@ for i in range(len(test_data)):
     std = np.std(tmp)
     if entro > STANDARD:
         all_predict += 1
+        uncertain.append(i)
     if test_label[i] > 2:
         if entro > STANDARD:
             true_predict += 1
@@ -91,4 +94,10 @@ print(
 print(
     f'Recall(for unknown class): {100*true_predict/(test_data.shape[0]-total):.4f} %')
 print(f'Accuracy(for unknown class):{100*true_predict/all_predict:.4f} %')
-plt.show()
+#plt.show()
+
+u_labels = myDBSCAN(test_data[uncertain])
+true_labels = test_label[uncertain]
+print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
+print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
+print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))

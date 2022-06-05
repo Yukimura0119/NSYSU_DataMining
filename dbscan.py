@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
 
-UNCLASSIFIED = False
+UNCLASSIFIED = 0
 NOISE = -1
 
 def _dist(p, q):
@@ -16,58 +16,49 @@ def _region_query(m, point_id, eps):
             inRegion.append(i)
     return inRegion
 
-def _expand_cluster(m, classifications, point_id, cluster_id, eps, min_points):
-    curRegion = _region_query(m, point_id, eps)
+def _expand_cluster(m, _labels, curPoint, cluster_id, eps, min_points):
+    curRegion = _region_query(m, curPoint, eps)
     if len(curRegion) < min_points:
-        classifications[point_id] = NOISE
+        _labels[curPoint] = NOISE
         return False
     else:
-        classifications[point_id] = cluster_id
-        for seed_id in curRegion:
-            classifications[seed_id] = cluster_id
+        _labels[curPoint] = cluster_id
+        for inRegion in curRegion:
+            _labels[inRegion] = cluster_id
             
         while len(curRegion) > 0:
             current_point = curRegion[0]
             results = _region_query(m, current_point, eps)
             if len(results) >= min_points:
-                for i in range(len(results)):
-                    result_point = results[i]
-                    if  classifications[result_point] == UNCLASSIFIED or \
-                        classifications[result_point] == NOISE:
-                        if classifications[result_point] == UNCLASSIFIED:
+                for result_point in results:
+                    if  _labels[result_point] == UNCLASSIFIED or \
+                        _labels[result_point] == NOISE:
+                        if _labels[result_point] == UNCLASSIFIED:
                             curRegion.append(result_point)
-                        classifications[result_point] = cluster_id
+                        _labels[result_point] = cluster_id
             curRegion = curRegion[1:]
         return True
 
-def myDBSCAN(m, eps, min_points):
-    """Implementation of Density Based Spatial Clustering of Applications with Noise
-    See https://en.wikipedia.org/wiki/DBSCAN
+def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> list:
+    """
+    Input:
+    m - input vector
+    eps - radius in range
+    min_points - minimum points to form a cluster
     
-    scikit-learn probably has a better implementation
-    
-    Uses Euclidean Distance as the measure
-    
-    Inputs:
-    m - A matrix whose columns are feature vectors
-    eps - Maximum distance two points can be to be regionally related
-    min_points - The minimum number of points to make a cluster
-    
-    Outputs:
-    An array with either a cluster id number or dbscan.NOISE (None) for each
-    column vector in m.
+    Output:
+    labeled list
     """
     cluster_id = 1
     n_points = m.shape[0]
     print(n_points)
-    classifications = [UNCLASSIFIED for _ in range(n_points)]
+    pointLabels = [UNCLASSIFIED for _ in range(n_points)]
     
     for point_id in range(n_points):
-        
-        if classifications[point_id] == UNCLASSIFIED:
-            if _expand_cluster(m, classifications, point_id, cluster_id, eps, min_points):
-                cluster_id = cluster_id + 1
-    return classifications
+        if pointLabels[point_id] == UNCLASSIFIED:
+            if _expand_cluster(m, pointLabels, point_id, cluster_id, eps, min_points):
+                cluster_id += 1
+    return pointLabels
 
 if __name__== "__main__" :
     MAX, DIM, EPS = 500, 16, 4
