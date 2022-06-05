@@ -1,48 +1,46 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
 
 UNCLASSIFIED = False
-NOISE = None
+NOISE = -1
 
-def _dist(p,q):
-	return math.sqrt(np.power(p-q, 2).sum())
-
-def _eps_neighborhood(p, q, eps):
-	return _dist(p,q) < eps
+def _dist(p, q):
+	return np.power(p-q, 2).sum()
 
 def _region_query(m, point_id, eps):
-    n_points = m.shape[1]
-    seeds = []
-    for i in range(0, n_points):
-        if _eps_neighborhood(m[:,point_id], m[:,i], eps):
-            seeds.append(i)
-    return seeds
+    inRegion = []
+    for i in range(m.shape[0]):
+        if _dist(m[point_id, :], m[i, :]) < eps**2:
+            inRegion.append(i)
+    return inRegion
 
 def _expand_cluster(m, classifications, point_id, cluster_id, eps, min_points):
-    seeds = _region_query(m, point_id, eps)
-    if len(seeds) < min_points:
+    curRegion = _region_query(m, point_id, eps)
+    if len(curRegion) < min_points:
         classifications[point_id] = NOISE
         return False
     else:
         classifications[point_id] = cluster_id
-        for seed_id in seeds:
+        for seed_id in curRegion:
             classifications[seed_id] = cluster_id
             
-        while len(seeds) > 0:
-            current_point = seeds[0]
+        while len(curRegion) > 0:
+            current_point = curRegion[0]
             results = _region_query(m, current_point, eps)
             if len(results) >= min_points:
-                for i in range(0, len(results)):
+                for i in range(len(results)):
                     result_point = results[i]
-                    if classifications[result_point] == UNCLASSIFIED or \
-                       classifications[result_point] == NOISE:
+                    if  classifications[result_point] == UNCLASSIFIED or \
+                        classifications[result_point] == NOISE:
                         if classifications[result_point] == UNCLASSIFIED:
-                            seeds.append(result_point)
+                            curRegion.append(result_point)
                         classifications[result_point] = cluster_id
-            seeds = seeds[1:]
+            curRegion = curRegion[1:]
         return True
 
-def dbscan(m, eps, min_points):
+def myDBSCAN(m, eps, min_points):
     """Implementation of Density Based Spatial Clustering of Applications with Noise
     See https://en.wikipedia.org/wiki/DBSCAN
     
@@ -60,11 +58,31 @@ def dbscan(m, eps, min_points):
     column vector in m.
     """
     cluster_id = 1
-    n_points = m.shape[1]
-    classifications = [UNCLASSIFIED] * n_points
-    for point_id in range(0, n_points):
-        point = m[:,point_id]
+    n_points = m.shape[0]
+    print(n_points)
+    classifications = [UNCLASSIFIED for _ in range(n_points)]
+    
+    for point_id in range(n_points):
+        
         if classifications[point_id] == UNCLASSIFIED:
             if _expand_cluster(m, classifications, point_id, cluster_id, eps, min_points):
                 cluster_id = cluster_id + 1
     return classifications
+
+if __name__== "__main__" :
+    MAX, DIM, EPS = 500, 16, 4
+    ax = plt.gca()
+    poi, true_labels = np.random.normal(0, 1, (MAX, DIM)), np.ones(MAX)
+    poi[MAX//2:] += np.random.normal(8, 2, (1, DIM))
+    for p in poi:
+        ax.add_patch(plt.Circle(tuple(p), EPS, color='k', alpha=0.1, fill=False))
+    true_labels[MAX//2:] += 1 
+    labels = myDBSCAN(poi, EPS, 8)
+    print(labels)
+    print("Homogeneity: %0.3f" % homogeneity_score(true_labels, labels))
+    print("Completeness: %0.3f" % completeness_score(true_labels, labels))
+    print("V-measure: %0.3f" % v_measure_score(true_labels, labels))
+
+    plt.scatter(poi[:, 0], poi[:, 1], c=labels)
+    plt.grid(color='k', linestyle='-', linewidth=0.5)
+    plt.show()
