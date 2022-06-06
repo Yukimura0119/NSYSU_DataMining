@@ -29,7 +29,7 @@ test_label = pd.read_csv(
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
-    './models/ds2_acc99.pth'))
+    './models/model_2.pth'))
 net.eval()
 
 test_data = test_data.drop(columns=['id'])
@@ -61,8 +61,8 @@ all_predict = 0
 correct = 0
 total = test_data.shape[0]
 test_data = prepocess(test_data, stds, means)
-uncertain = []
-for i in range(len(test_data)):
+uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
+for i in range(total):
     result = net(torch.tensor(
         test_data[i], device=device, dtype=torch.float32))
     _, idx = torch.max(result.data, 0)
@@ -74,6 +74,8 @@ for i in range(len(test_data)):
     prob = tmp/np.sum(tmp)
     entro = entropy(prob)
     std = np.std(tmp)
+    predictLabels[i] = int(idx)
+
     if entro > STANDARD:
         all_predict += 1
         uncertain.append(i)
@@ -82,7 +84,7 @@ for i in range(len(test_data)):
             true_predict += 1
         plt.scatter(test_label[i], entro, c="blue")
         total -= 1
-    elif test_label[i] == int(idx):
+    elif test_label[i] == predictLabels[i]:
         plt.scatter(test_label[i], entro, c="green")
         correct += 1
     else:
@@ -96,10 +98,15 @@ print(
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()
 
-# with open('./uncertain.csv', 'w', newline='') as csvfile:
-#     writer = csv.writer(csvfile)
-#     writer.writerow(uncertain)
+with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
+    import csv
+    writer = csv.writer(csv_uncertain)
+    writer.writerow(uncertain)
 
+with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
+    import csv
+    writer = csv.writer(csv_predictLabels)
+    writer.writerow(predictLabels)
 # feature sel by largest std
 # idx = np.argpartition(stds, -DIM)[-DIM:]
 # inputData = test_data[np.ix_(uncertain, idx)]

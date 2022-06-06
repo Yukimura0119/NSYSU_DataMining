@@ -17,6 +17,9 @@ def splitResult2(path1, path2):
     label = np.array(label, dtype=np.int32)
     return data, label
 
+def readListCSV(path: str) -> np.array: 
+    data = pd.read_csv(path, header=None)
+    return np.squeeze(np.array(data))
 
 def prepocess(arr: np.ndarray, stds: np.ndarray, means: np.ndarray):
     arr = arr.T

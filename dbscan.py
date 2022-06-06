@@ -39,7 +39,7 @@ def _expand_cluster(m, _labels, curPoint, cluster_id, eps, min_points):
             curRegion = curRegion[1:]
         return True
 
-def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> list:
+def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> np.array:
     """
     Input:
     m - input vector
@@ -52,7 +52,7 @@ def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> list:
     cluster_id = 1
     n_points = m.shape[0]
     print(n_points)
-    pointLabels = [UNCLASSIFIED for _ in range(n_points)]
+    pointLabels = np.zeros((n_points,), dtype=int)
     
     for point_id in range(n_points):
         if pointLabels[point_id] == UNCLASSIFIED:
