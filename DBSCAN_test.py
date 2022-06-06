@@ -25,8 +25,7 @@ for i in cc.keys():
     cur = set(np.argwhere(pred_labels == i).squeeze())
     # print(cur)
     for s in sl:
-        print('DSC', 2*len(cur & s)/(len(cur)+len(s)), end='')
-        print(' Jaccard', len(cur & s)/(len(cur | s)))
+        print('DSC', 2*len(cur & s)/(len(cur)+len(s)))
     print()
 print("Homogeneity: %0.3f" % homogeneity_score(y, pred_labels))
 print("Completeness: %0.3f" % completeness_score(y, pred_labels))

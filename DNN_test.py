@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from Network import Net
-from Util.util import prepocess
+from Util.util import *
 from dbscan import *
 
 EPS = 1E-16
@@ -60,7 +60,7 @@ all_predict = 0
 
 correct = 0
 total = test_data.shape[0]
-test_data = prepocess(test_data, stds, means)
+test_data = preprocess(test_data, stds, means)
 uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
 for i in range(total):
     result = net(torch.tensor(
@@ -98,15 +98,15 @@ print(
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()
 
-with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
-    import csv
-    writer = csv.writer(csv_uncertain)
-    writer.writerow(uncertain)
+# with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
+#     import csv
+#     writer = csv.writer(csv_uncertain)
+#     writer.writerow(uncertain)
 
-with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
-    import csv
-    writer = csv.writer(csv_predictLabels)
-    writer.writerow(predictLabels)
+# with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
+#     import csv
+#     writer = csv.writer(csv_predictLabels)
+#     writer.writerow(predictLabels)
 # feature sel by largest std
 # idx = np.argpartition(stds, -DIM)[-DIM:]
 # inputData = test_data[np.ix_(uncertain, idx)]

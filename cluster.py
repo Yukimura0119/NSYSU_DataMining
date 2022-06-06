@@ -26,7 +26,7 @@ means = np.array(std_mean['mean'])
 
 idx = np.argpartition(stds, -DIM)[-DIM:]
 trn_data = trn_data[:, idx]
-trn_data = prepocess(trn_data, stds, means)
+trn_data = preprocess(trn_data, stds, means)
 print(trn_data.shape)
 
 clustering = DBSCAN(eps=EPS, min_samples=8).fit(trn_data)

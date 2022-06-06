@@ -51,7 +51,7 @@ def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> np.array:
     """
     cluster_id = 1
     n_points = m.shape[0]
-    print(n_points)
+    #print(n_points)
     pointLabels = np.zeros((n_points,), dtype=int)
     
     for point_id in range(n_points):
