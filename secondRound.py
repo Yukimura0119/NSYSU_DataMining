@@ -5,7 +5,7 @@ from dbscan import *
 from Util.util import *
 from collections import Counter
 
-RADIUS, MINP = 120, 10
+RADIUS, MINP = 60, 6
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
@@ -17,7 +17,8 @@ tst_labl = splitResultNoID('./Gene_Expression_DataSet/test_label.csv', dtype=str
 tst_labl = replace_data_label(tst_labl)
 true_labels = np.squeeze(tst_labl)
 
-dnnPredict = np.full((tst_labl.shape[0],), -1)
+dnnPredict = readListCSV('./dnnPredict.csv')
+#dnnPredict = np.full((tst_labl.shape[0],), -1)
 
 print(tst_data.shape, centers.shape)
 print(tst_labl.shape, dnnPredict.shape)
@@ -46,9 +47,19 @@ for i in cc.keys():
     fit = [(i, len(cur & s)/len(cur | s)) for i, s in sl]
     print(*fit, sep='\n')
     rst = max(fit, key=lambda x: x[1])
-    print(rst[0])
+    print(f'set = {rst[0]}')
     pred_labels[idx] = dnnPredict[idx] = rst[0]
-#print(np.dstack((pred_labels, true_labels)))
 
+idx = np.argwhere(pred_labels == -1).squeeze()
+out = tst_data[idx]
+print(out.shape)
+for i, p in zip(idx, out):
+    d = [np.linalg.norm(c-p) for c in centers]
+    closestC = np.argmin(d)
+    dnnPredict[i] = closestC
+    
+cc = dict(Counter(dnnPredict))
+print('Updated\nDBSCAN label: ', cc)
+print('Ground truth: ', dict(zip(uniques, counts)))
 print("final acc: ", np.count_nonzero(tst_labl == dnnPredict)/tst_labl.shape[0])
 # print(np.dstack((tst_labl, dnnPredict)))

@@ -1,31 +1,36 @@
 import torch
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 
 from Network import Net
 from Util.util import *
 from dbscan import *
 
-EPS = 1E-16
+EPS = 1E-15
 STANDARD = 0.125
-MODEL_NAME = 'new_pca_model.pth'
+MODEL_NAME = 'VeryGood.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
 
-test_data = splitResult2(
+test_data = pd.read_csv(
     './Gene_Expression_DataSet/reduced_test_data.csv')
-test_label = splitResultNoID(
-    './Gene_Expression_DataSet/test_label.csv', str)
+test_label = pd.read_csv(
+    './Gene_Expression_DataSet/test_label.csv')
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
-    './models/new_pca_model.pth'))
+    f'./models/'+MODEL_NAME))
 net.eval()
+
+test_label = test_label.drop(columns=['id'])
+test_data = np.array(test_data)
+test_label = np.array(test_label)
+print(test_data.shape, test_label.shape)
 
 test_label[test_label == 'KIRC'] = 0
 test_label[test_label == 'BRCA'] = 1
@@ -33,6 +38,7 @@ test_label[test_label == 'LUAD'] = 2
 test_label[test_label == 'PRAD'] = 3
 test_label[test_label == 'COAD'] = 4
 test_label = test_label.astype(int)
+
 
 def entropy(data):
     entro = 0
@@ -44,19 +50,23 @@ def entropy(data):
 true_predict = 0
 all_predict = 0
 
+
 correct = 0
 total = test_data.shape[0]
 uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
 
+running_loss = 0.0
 for i in range(total):
     result = net(torch.tensor(
         test_data[i], device=device, dtype=torch.float32))
     _, idx = torch.max(result.data, 0)
-    tmp = result.to(device='cpu').detach().numpy()
 
-    tmp = tmp-np.min(tmp)
-    prob = tmp/np.sum(tmp)
+    tmp = result.to(device='cpu').detach().numpy()
+    a = np.min(tmp)
+    b = np.max(tmp)
+    prob = (tmp-a)/(b-a)
     entro = entropy(prob)
+
     std = np.std(tmp)
     predictLabels[i] = int(idx)
 
@@ -73,7 +83,6 @@ for i in range(total):
         correct += 1
     else:
         plt.scatter(test_label[i], entro, c="red")
-
 print(f'Correct: {correct}')
 print(
     f'Accuracy(no unknown class): {100 * correct // total} %')
