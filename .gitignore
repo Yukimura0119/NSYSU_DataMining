@@ -10,5 +10,4 @@ __pycache__/
 .vscode
 /Gene_Expression_DataSet
 new_model_weights*
-ds2*
 *.pth
