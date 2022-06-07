@@ -8,10 +8,15 @@ from Network import Net
 from Util.util import *
 from dbscan import *
 
+<<<<<<< HEAD
 EPS = 1E-15
 STANDARD = 0.1
 MODEL_NAME = 'pca_model_0.15.pth'
 
+=======
+EPS = 1E-16
+STANDARD = 0.15
+>>>>>>> fdc920c7aff4d64e7b09d318ae71eb9e96a12fe4
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 absFilePath = os.path.abspath(__file__)
@@ -24,7 +29,11 @@ test_label = pd.read_csv(
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
+<<<<<<< HEAD
     f'./models/'+MODEL_NAME))
+=======
+    './models/pca_model_0.15.pth'))
+>>>>>>> fdc920c7aff4d64e7b09d318ae71eb9e96a12fe4
 net.eval()
 
 test_label = test_label.drop(columns=['id'])
@@ -90,22 +99,12 @@ print(
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()
 
-# with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
-#     import csv
-#     writer = csv.writer(csv_uncertain)
-#     writer.writerow(uncertain)
+with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
+    import csv
+    writer = csv.writer(csv_uncertain)
+    writer.writerow(uncertain)
 
-# with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
-#     import csv
-#     writer = csv.writer(csv_predictLabels)
-#     writer.writerow(predictLabels)
-# feature sel by largest std
-# idx = np.argpartition(stds, -DIM)[-DIM:]
-# inputData = test_data[np.ix_(uncertain, idx)]
-# true_labels = np.squeeze(test_label[uncertain])
-# print(inputData.shape)
-# u_labels = myDBSCAN(inputData, RADIUS, MINP)
-
-# print("Homogeneity: %0.3f" % homogeneity_score(true_labels, u_labels))
-# print("Completeness: %0.3f" % completeness_score(true_labels, u_labels))
-# print("V-measure: %0.3f" % v_measure_score(true_labels, u_labels))
+with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
+    import csv
+    writer = csv.writer(csv_predictLabels)
+    writer.writerow(predictLabels)
