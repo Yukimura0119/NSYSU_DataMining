@@ -5,32 +5,33 @@ from dbscan import *
 from Util.util import *
 from collections import Counter
 
-STANDARD = 0.45
-DIM, RADIUS, MINP = 20, 80, 10
+DIM, RADIUS, MINP = 20, 120, 10
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
-
-dnnPredict = readListCSV('./dnnPredict.csv')
-uncertain  = readListCSV('./uncertain.csv')
 
 std_mean = pd.read_csv('./std_mean.csv')
 stds = np.array(std_mean['std'])
 means = np.array(std_mean['mean'])
 
-tst_data  = splitResult2('./Gene_Expression_DataSet/reduced_test_data_2_32.csv')
+tst_data  = splitResult2('./Gene_Expression_DataSet/reduced_train_data_32.csv')
 # inputData = splitResult2('./Gene_Expression_DataSet/processed.csv')
-tst_labl, _ = splitResult('./Gene_Expression_DataSet/test_label.csv', dtype=str)
+tst_labl, _ = splitResult('./Gene_Expression_DataSet/train_label.csv', dtype=str)
 tst_labl = replace_data_label(tst_labl)
 true_labels = np.squeeze(tst_labl)
+
+#dnnPredict = readListCSV('./dnnPredict.csv')
+dnnPredict = np.full((tst_labl.shape[0],), -1)
+#uncertain  = readListCSV('./uncertain.csv')
+
 # feature sel by largest std
 # idx = np.argpartition(stds, -DIM)[-DIM:]
 # tst_data = preprocess(tst_data, stds, means)
 # inputData = tst_data[np.ix_(uncertain, idx)]
-inputData = tst_data[uncertain]
+#inputData = tst_data[uncertain]
 
 print(tst_labl.shape, dnnPredict.shape)
-print(tst_data.shape, inputData.shape)
+#print(tst_data.shape, inputData.shape)
 
 pred_labels = myDBSCAN(tst_data, RADIUS, MINP)
 
