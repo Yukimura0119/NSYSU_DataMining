@@ -21,20 +21,15 @@ os.chdir(os.path.dirname(absFilePath))
 #     '/home/yukimura/Workplace/NSYSU/Datamining/Final/Arrhythmia_DataSet/test_label.csv', header=None)
 std_mean = pd.read_csv(
     './std_mean.csv')
-test_data = pd.read_csv(
+test_data = splitResult2(
     './Gene_Expression_DataSet/reduced_test_data.csv')
-test_label = pd.read_csv(
-    './Gene_Expression_DataSet/test_label.csv')
+test_label = splitResultNoID(
+    './Gene_Expression_DataSet/test_label.csv', str)
 
 net = Net().to(device)
 net.load_state_dict(torch.load(
     './models/pca_model_0.15.pth'))
 net.eval()
-
-test_data = test_data.drop(columns=['id'])
-test_label = test_label.drop(columns=['id'])
-test_data = np.array(test_data)
-test_label = np.array(test_label)
 
 test_label[test_label == 'KIRC'] = 0
 test_label[test_label == 'BRCA'] = 1
@@ -61,6 +56,7 @@ correct = 0
 total = test_data.shape[0]
 test_data = preprocess(test_data, stds, means)
 uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
+
 for i in range(total):
     result = net(torch.tensor(
         test_data[i], device=device, dtype=torch.float32))
@@ -97,12 +93,12 @@ print(
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()
 
-with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
-    import csv
-    writer = csv.writer(csv_uncertain)
-    writer.writerow(uncertain)
+# with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
+#     import csv
+#     writer = csv.writer(csv_uncertain)
+#     writer.writerow(uncertain)
 
-with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
-    import csv
-    writer = csv.writer(csv_predictLabels)
-    writer.writerow(predictLabels)
+# with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
+#     import csv
+#     writer = csv.writer(csv_predictLabels)
+#     writer.writerow(predictLabels)

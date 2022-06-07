@@ -17,8 +17,8 @@ PATH2 = './Gene_Expression_DataSet/train_label.csv'
 RESULT = './result/'
 
 std_mean = pd.read_csv('./std_mean.csv')
-trn_data, _ = splitResult(PATH1)
-trn_labl, _ = splitResult(PATH2, dtype=str)
+trn_data = splitResultNoID(PATH1)
+trn_labl = splitResultNoID(PATH2, dtype=str)
 trn_labl = replace_data_label(trn_labl)
 
 stds = np.array(std_mean['std'])

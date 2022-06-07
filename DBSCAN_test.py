@@ -12,7 +12,7 @@ MAX, DIM = 500, 5
 X, y = make_blobs(MAX, DIM, centers=4)
 u = np.unique(y)
 sl = [set(np.argwhere(y == i).squeeze()) for i in u]
-
+'''
 clustering = DBSCAN(eps=1.5, min_samples=4).fit(X)
 pred_labels = clustering.labels_
 
@@ -32,3 +32,10 @@ print("Completeness: %0.3f" % completeness_score(y, pred_labels))
 print("V-measure: %0.3f" % v_measure_score(y, pred_labels))
 plt.scatter(X[:, 0], X[:, 1], c=pred_labels)
 plt.show()
+'''
+a = np.array((1, 2, 3))
+b = np.array((4, 5, 6))
+
+dist = np.linalg.norm(a-b)
+
+print(dist)

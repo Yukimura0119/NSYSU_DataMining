@@ -2,11 +2,11 @@ import numpy as np
 import pandas as pd
 
 
-def splitResult(path: str, dtype=np.float32):
+def splitResultNoID(path: str, dtype=np.float32):
     data = pd.read_csv(path)
-    result = np.array(data['id'])
-    data = np.array(data.drop('id', axis='columns'), dtype=dtype)
-    return data, result
+    data = data.drop('id', axis='columns')
+    data = np.array(data, dtype=dtype)
+    return data
 
 
 def splitResult2(path1, path2 = '', header=None):
