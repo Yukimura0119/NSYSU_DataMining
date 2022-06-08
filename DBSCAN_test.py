@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from dbscan import *
 from Util.util import *
 from sklearn.cluster import DBSCAN
@@ -8,27 +7,48 @@ from collections import Counter
 from pandas.plotting import scatter_matrix
 import matplotlib.pyplot as plt
 
-MAX, DIM = 500, 5
-X, y = make_blobs(MAX, DIM, centers=4)
-u = np.unique(y)
-sl = [set(np.argwhere(y == i).squeeze()) for i in u]
 
-clustering = DBSCAN(eps=1.5, min_samples=4).fit(X)
+MAX, DIM, EPS = 400, 2, 4
+X, y, centers = make_blobs(MAX, DIM, centers=4, center_box=(-64, 64), return_centers=True)
+clustering = DBSCAN(eps=EPS, min_samples=10).fit(X)
 pred_labels = clustering.labels_
+pltcol = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-cc = dict(Counter(pred_labels))
-print(cc)
+sl = [(i, set(np.argwhere(y == i).squeeze())) for i in set(y)]
 
-for i in cc.keys():
+ax = plt.gca()
+for i,c in enumerate(centers):
+    ax.add_patch(plt.Circle((c[0], c[1]), EPS*2, color=pltcol[i], alpha=0.2))
+ax.set_aspect('equal', adjustable='datalim')
+
+for i in set(pred_labels):
     if i < 0:
         continue
-    cur = set(np.argwhere(pred_labels == i).squeeze())
-    # print(cur)
-    for s in sl:
-        print('DSC', 2*len(cur & s)/(len(cur)+len(s)))
-    print()
-print("Homogeneity: %0.3f" % homogeneity_score(y, pred_labels))
-print("Completeness: %0.3f" % completeness_score(y, pred_labels))
-print("V-measure: %0.3f" % v_measure_score(y, pred_labels))
-plt.scatter(X[:, 0], X[:, 1], c=pred_labels)
+    idx = np.argwhere(pred_labels == i).squeeze()
+    cur = set(idx)
+    fit = [(i, len(cur & s)/len(cur | s)) for i, s in sl]
+    rst = max(fit, key=lambda x: x[1])
+    pred_labels[idx] = rst[0]
+    print(*fit, sep='\n')
+    print(f'label set {i} = {rst[0]}')
+
+evalLabel(y, pred_labels, 'DBSCAN')
+print(pred_labels.shape)
+plt.scatter(X[:, 0], X[:, 1], c=[pltcol[i] for i in pred_labels])
+plt.show()
+
+ax = plt.gca()
+for i,c in enumerate(centers):
+    ax.add_patch(plt.Circle((c[0], c[1]), EPS*2, color=pltcol[i], alpha=0.2))
+ax.set_aspect('equal', adjustable='datalim')
+
+idx = np.argwhere(pred_labels == -1).squeeze()
+out = X[idx]
+for i, p in zip(idx, out):
+    d = [np.linalg.norm(c-p) for c in centers]
+    closestC = np.argmin(d)
+    pred_labels[i] = closestC
+
+evalLabel(y, pred_labels, 'Final')
+plt.scatter(X[:, 0], X[:, 1], c=[pltcol[i] for i in pred_labels])
 plt.show()

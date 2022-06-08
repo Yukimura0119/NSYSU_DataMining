@@ -1,64 +1,63 @@
-import pandas as pd
 import numpy as np
 import os
 from dbscan import *
 from Util.util import *
-from collections import Counter
 
-DIM, RADIUS, MINP = 20, 120, 10
+RADIUS, MINP = 60, 6
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
 
-std_mean = pd.read_csv('./std_mean.csv')
-stds = np.array(std_mean['std'])
-means = np.array(std_mean['mean'])
+centers = splitResult('./Cache/CenterOfPoints.csv')
+tst_data = splitResult('./Gene_Expression_DataSet/reduced_test_data_32.csv')
+tst_labl = splitResultNoID(
+    './Gene_Expression_DataSet/test_label.csv', dtype=str)
+true_labels = replace_data_label(tst_labl)
 
-tst_data  = splitResult2('./Gene_Expression_DataSet/reduced_train_data_32.csv')
-# inputData = splitResult2('./Gene_Expression_DataSet/processed.csv')
-tst_labl, _ = splitResult('./Gene_Expression_DataSet/train_label.csv', dtype=str)
-tst_labl = replace_data_label(tst_labl)
-true_labels = np.squeeze(tst_labl)
+uncertain = pd.read_csv('./Cache/uncertain.csv', header=None).squeeze()
+dnnPredict = pd.read_csv('./Cache/dnnPredict.csv', header=None).squeeze()
+#dnnPredict = np.full((true_labels.shape[0],), -1)
 
-#dnnPredict = readListCSV('./dnnPredict.csv')
-dnnPredict = np.full((tst_labl.shape[0],), -1)
-#uncertain  = readListCSV('./uncertain.csv')
-
-# feature sel by largest std
-# idx = np.argpartition(stds, -DIM)[-DIM:]
-# tst_data = preprocess(tst_data, stds, means)
-# inputData = tst_data[np.ix_(uncertain, idx)]
-#inputData = tst_data[uncertain]
-
-print(tst_labl.shape, dnnPredict.shape)
-#print(tst_data.shape, inputData.shape)
+print(tst_data.shape, centers.shape)
+print(tst_labl.shape, true_labels.shape, dnnPredict.shape)
 
 pred_labels = myDBSCAN(tst_data, RADIUS, MINP)
 
-print("Homogeneity: %0.3f" % homogeneity_score(true_labels, pred_labels))
-print("Completeness: %0.3f" % completeness_score(true_labels, pred_labels))
-print("V-measure: %0.3f" % v_measure_score(true_labels, pred_labels))
+print(true_labels)
+print(pred_labels)
+evalLabel(true_labels, dnnPredict, 'DNN')
+evalLabel(true_labels, pred_labels, 'DBSCAN')
 
-print("original acc: ", np.count_nonzero(tst_labl == dnnPredict)/tst_labl.shape[0])
+sl = [(i, set(np.argwhere(true_labels == i).squeeze()))
+      for i in set(true_labels)]
+centerID = [0, 1, 2]
 
-cc = dict(Counter(pred_labels))
-print('Uncertain\nDBSCAN label: ', cc)
-uniques, counts = np.unique(true_labels, return_counts=True)
-print('Ground truth: ', dict(zip(uniques, counts)))
-
-sl = [(i, set(np.argwhere(true_labels == i).squeeze())) for i in uniques]
-
-for i in cc.keys():
+for i in set(pred_labels):
     if i < 0:
         continue
     idx = np.argwhere(pred_labels == i).squeeze()
     cur = set(idx)
     fit = [(i, len(cur & s)/len(cur | s)) for i, s in sl]
-    print(*fit, sep='\n')
     rst = max(fit, key=lambda x: x[1])
-    print(rst[0])
-    pred_labels[idx] = dnnPredict[idx] = rst[0]
-#print(np.dstack((pred_labels, true_labels)))
+    intersect = np.intersect1d(idx, uncertain)
+    # print(intersect)
+    dnnPredict[intersect] = rst[0]
+    # print(*fit, sep='\n')
+    # print(f'label set {i} = {rst[0]}')
 
-print("final acc: ", np.count_nonzero(tst_labl == dnnPredict)/tst_labl.shape[0])
-# print(np.dstack((tst_labl, dnnPredict)))
+    # if idx.shape[0] > 2*MINP:
+    #     clstCenter = np.mean(tst_data[idx], axis=0)
+    #     centers = np.vstack((centers, clstCenter))
+    #     centerID.append(rst[0])
+
+# print(centerID, centers.shape)
+idx = np.argwhere(pred_labels == -1).squeeze()
+out = tst_data[idx]
+print(out.shape)
+for i, p in zip(idx, out):
+    d = [np.linalg.norm(c-p) for c in centers]
+    closestC = centerID[np.argmin(d)]
+    dnnPredict[i] = closestC
+
+evalLabel(true_labels, dnnPredict, 'Final')
+# print(np.dstack((true_labels, dnnPredict)))
