@@ -5,7 +5,7 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader2 as DataLoader
 import os
-from Network import Net
+from models.Network import Net
 
 TARGET_LOSS = 5E-8
 SAVE_MODEL_NAME = 'new_pca_model.pth'
