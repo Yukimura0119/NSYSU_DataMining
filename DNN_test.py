@@ -5,10 +5,12 @@ import numpy as np
 import os
 
 from Network import Net
+from Util.util import *
+from dbscan import *
 
 EPS = 1E-15
-STANDARD = 0.1
-MODEL_NAME = 'pca_model_0.15.pth'
+STANDARD = 0.15
+MODEL_NAME = 'new_pca_model.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,6 +52,7 @@ all_predict = 0
 
 correct = 0
 total = test_data.shape[0]
+uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
 running_loss = 0.0
 for i in range(len(test_data)):
     result = net(torch.tensor(
@@ -63,14 +66,17 @@ for i in range(len(test_data)):
     entro = entropy(prob)
 
     std = np.std(tmp)
+    predictLabels[i] = int(idx)
+
     if entro > STANDARD:
         all_predict += 1
+        uncertain.append(i)
     if test_label[i] > 2:
         if entro > STANDARD:
             true_predict += 1
         plt.scatter(test_label[i], entro, c="blue")
         total -= 1
-    elif test_label[i] == int(idx):
+    elif test_label[i] == predictLabels[i]:
         plt.scatter(test_label[i], entro, c="green")
         correct += 1
     else:
@@ -80,5 +86,5 @@ print(
     f'Accuracy(no unknown class): {100 * correct // total} %')
 print(
     f'Recall(for unknown class): {100*true_predict/(test_data.shape[0]-total):.4f} %')
-print(f'Accuracy(for unknown class):{100*true_predict/all_predict:.4f} %')
+print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()

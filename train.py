@@ -8,7 +8,7 @@ import os
 from Network import Net
 
 TARGET_LOSS = 5E-8
-SAVE_MODEL_NAME = 'pca_model_2.pth'
+SAVE_MODEL_NAME = 'new_pca_model.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

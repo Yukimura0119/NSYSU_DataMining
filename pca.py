@@ -23,13 +23,24 @@ scaler.fit(train_data)
 train_data = scaler.transform(train_data)
 test_data = scaler.transform(test_data)
 
+
 pca = PCA(n_components=256)
+pca_32 = PCA(n_components=32)
 
 trans = pca.fit(train_data)
+trans_32 = pca_32.fit(train_data)
+
 train_res = trans.transform(train_data)
 test_res = trans.transform(test_data)
+
+train_res_32 = trans_32.transform(train_data)
+test_res_32 = trans_32.transform(test_data)
 
 df = pd.DataFrame(data=train_res)
 df.to_csv('./Gene_Expression_DataSet/reduced_train_data.csv', index=False)
 df = pd.DataFrame(data=test_res)
 df.to_csv('./Gene_Expression_DataSet/reduced_test_data.csv', index=False)
+df = pd.DataFrame(data=train_res_32)
+df.to_csv('./Gene_Expression_DataSet/reduced_train_data_32.csv', index=False)
+df = pd.DataFrame(data=test_res_32)
+df.to_csv('./Gene_Expression_DataSet/reduced_test_data_32.csv', index=False)

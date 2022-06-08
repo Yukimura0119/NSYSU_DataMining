@@ -18,6 +18,4 @@ class Net(nn.Module):
         x = func.relu(self.fc3(x))
         x = func.relu(self.fc4(x))
 
-        # with softmax
-        # return func.softmax(self.l3(x), dim=-1)
         return self.fc5(x)
