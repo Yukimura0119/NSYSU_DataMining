@@ -32,13 +32,13 @@ test_data = np.array(test_data)
 test_label = np.array(test_label)
 print(test_data.shape, test_label.shape)
 
-test_label[test_label == 'KIRC'] = 0
-test_label[test_label == 'BRCA'] = 1
-test_label[test_label == 'LUAD'] = 2
-test_label[test_label == 'PRAD'] = 3
-test_label[test_label == 'COAD'] = 4
-test_label = test_label.astype(int)
-
+# test_label[test_label == 'KIRC'] = 0
+# test_label[test_label == 'BRCA'] = 1
+# test_label[test_label == 'LUAD'] = 2
+# test_label[test_label == 'PRAD'] = 3
+# test_label[test_label == 'COAD'] = 4
+# test_label = test_label.astype(int)
+test_label = replace_data_label(test_label)
 
 def entropy(data):
     entro = 0
@@ -53,7 +53,10 @@ all_predict = 0
 
 correct = 0
 total = test_data.shape[0]
-uncertain, predictLabels = [], np.full((total,), -1, dtype=int)
+# predictLabels = np.zeros((total,), dtype=float)
+predictLabels = np.full((total,), -1, dtype=int)
+entro = np.zeros((total,), dtype=float)
+colors = np.full((total,), '', dtype=str)
 
 running_loss = 0.0
 for i in range(total):
@@ -65,25 +68,26 @@ for i in range(total):
     a = np.min(tmp)
     b = np.max(tmp)
     prob = (tmp-a)/(b-a)
-    entro = entropy(prob)
+    entro[i] = entropy(prob)
 
-    std = np.std(tmp)
+    # std = np.std(tmp)
     predictLabels[i] = int(idx)
 
-    if entro > STANDARD:
+    if entro[i] > STANDARD:
         all_predict += 1
-        uncertain.append(i)
     if test_label[i] > 2:
-        if entro > STANDARD:
+        if entro[i] > STANDARD:
             true_predict += 1
-        plt.scatter(test_label[i], entro, c="blue")
+        colors[i] = "blue"
         total -= 1
     elif test_label[i] == predictLabels[i]:
-        plt.scatter(test_label[i], entro, c="green")
+        colors[i] = "green"
         correct += 1
     else:
-        plt.scatter(test_label[i], entro, c="red")
-        
+        colors[i] = 'red'
+
+plt.scatter(test_label, entro, c=colors)
+
 print(f'Correct: {correct}')
 print(
     f'Accuracy(no unknown class): {100 * correct // total} %')
@@ -97,7 +101,8 @@ plt.show()
 #     writer = csv.writer(csv_uncertain)
 #     writer.writerow(uncertain)
 
-# with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
-#     import csv
-#     writer = csv.writer(csv_predictLabels)
-#     writer.writerow(predictLabels)
+predictLabels[entro > STANDARD] = -1
+with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
+    import csv
+    writer = csv.writer(csv_predictLabels)
+    writer.writerow(predictLabels)
