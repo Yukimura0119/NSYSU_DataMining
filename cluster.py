@@ -4,8 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
 from sklearn.cluster import DBSCAN
-from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
-from pandas.plotting import scatter_matrix
 from Util.util import *
 from dbscan import *
 
@@ -35,7 +33,7 @@ labels1 = clustering.labels_
 print("Sklearn DBSCAN\nHomogeneity: %0.3f" % homogeneity_score(trn_labl, labels1))
 print("Completeness: %0.3f" % completeness_score(trn_labl, labels1))
 print("V-measure: %0.3f" % v_measure_score(trn_labl, labels1))
-print(Counter(labels1))
+print(dict(Counter(labels1)))
 
 labels2 = myDBSCAN(trn_data, EPS, 8)
 print("Our DBSCAN\nHomogeneity: %0.3f" % homogeneity_score(trn_labl, labels2))

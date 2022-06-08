@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
 
 def splitResultNoID(path: str, dtype=np.float32):
     data = pd.read_csv(path)
@@ -41,3 +41,15 @@ def replace_data_label(data):
     data[data == 'PRAD'] = 3
     data[data == 'COAD'] = 4
     return np.squeeze(data.astype(np.int32))
+
+def evalLabel(truth, predi, msg=''):
+    print("Homogeneity: %0.3f" % homogeneity_score(truth, predi))
+    print("Completeness: %0.3f" % completeness_score(truth, predi))
+    print("V-measure: %0.3f" % v_measure_score(truth, predi))
+
+    u2, c2 = np.unique(predi, return_counts=True)
+    print('Prediction: ', dict(zip(u2, c2)))
+    u1, c1 = np.unique(truth, return_counts=True)
+    print('Ground truth: ', dict(zip(u1, c1)))
+    print(msg, f'acc: {np.count_nonzero(truth == predi)/truth.shape[0] : 0.3f}\n')
+    
