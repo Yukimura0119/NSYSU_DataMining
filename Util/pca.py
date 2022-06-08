@@ -37,12 +37,4 @@ test_res_32 = trans_32.transform(test_data)
 df = pd.DataFrame(data=train_res)
 df.to_csv('./../Gene_Expression_DataSet/reduced_train_data.csv', index=False)
 df = pd.DataFrame(data=test_res)
-<<<<<<< HEAD:pca.py
-df.to_csv('./Gene_Expression_DataSet/reduced_test_data.csv', index=False)
-df = pd.DataFrame(data=train_res_32)
-df.to_csv('./Gene_Expression_DataSet/reduced_train_data_32.csv', index=False)
-df = pd.DataFrame(data=test_res_32)
-df.to_csv('./Gene_Expression_DataSet/reduced_test_data_32.csv', index=False)
-=======
 df.to_csv('./../Gene_Expression_DataSet/reduced_test_data.csv', index=False)
->>>>>>> dbscan_2:Util/pca.py
