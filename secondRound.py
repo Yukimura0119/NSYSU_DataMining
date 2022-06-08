@@ -13,7 +13,8 @@ tst_data  = splitResult2('./Gene_Expression_DataSet/reduced_test_data_32.csv')
 tst_labl = splitResultNoID('./Gene_Expression_DataSet/test_label.csv', dtype=str)
 true_labels = replace_data_label(tst_labl)
 
-dnnPredict = pd.read_csv('./dnnPredict.csv', header=None)
+uncertain = pd.read_csv('./uncertain.csv', header=None).squeeze()
+dnnPredict = pd.read_csv('./dnnPredict.csv', header=None).squeeze()
 #dnnPredict = np.full((true_labels.shape[0],), -1)
 
 print(tst_data.shape, centers.shape)
@@ -24,8 +25,7 @@ pred_labels = myDBSCAN(tst_data, RADIUS, MINP)
 evalLabel(true_labels, dnnPredict, 'DNN')
 evalLabel(true_labels, pred_labels, 'DBSCAN')
 
-uniques = np.unique(true_labels)
-sl = [(i, set(np.argwhere(true_labels == i).squeeze())) for i in uniques]
+sl = [(i, set(np.argwhere(true_labels == i).squeeze())) for i in set(true_labels)]
 centerID = [0, 1, 2]
 
 for i in set(pred_labels):
@@ -35,8 +35,9 @@ for i in set(pred_labels):
     cur = set(idx)
     fit = [(i, len(cur & s)/len(cur | s)) for i, s in sl]
     rst = max(fit, key=lambda x: x[1])
-    filter_idx = np.argwhere(pred_labels == i).squeeze()
-    dnnPredict[idx] = rst[0]
+    intersect = np.intersect1d(idx, uncertain)
+    # print(intersect)
+    dnnPredict[intersect] = rst[0]
     # print(*fit, sep='\n')
     # print(f'label set {i} = {rst[0]}')
 

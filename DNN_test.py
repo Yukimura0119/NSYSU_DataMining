@@ -53,7 +53,7 @@ all_predict = 0
 
 correct = 0
 total = test_data.shape[0]
-# predictLabels = np.zeros((total,), dtype=float)
+uncertain = []
 predictLabels = np.full((total,), -1, dtype=int)
 entro = np.zeros((total,), dtype=float)
 colors = np.full((total,), '', dtype=str)
@@ -96,12 +96,11 @@ print(
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 plt.show()
 
-# with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
-#     import csv
-#     writer = csv.writer(csv_uncertain)
-#     writer.writerow(uncertain)
+with open('./uncertain.csv', 'w', newline='') as csv_uncertain:
+    import csv
+    writer = csv.writer(csv_uncertain)
+    writer.writerow(np.argwhere(entro > STANDARD).squeeze())
 
-predictLabels[entro > STANDARD] = -1
 with open('./dnnPredict.csv', 'w', newline='') as csv_predictLabels:
     import csv
     writer = csv.writer(csv_predictLabels)
