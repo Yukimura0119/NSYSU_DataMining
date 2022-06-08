@@ -9,28 +9,10 @@ def splitResultNoID(path: str, dtype=np.float32):
     data = np.array(data, dtype=dtype)
     return data
 
-
-def splitResult2(path1, path2='', header=None):
-    data = pd.read_csv(path1, header=header)
-    data = np.array(data, dtype=np.float32)
-
-    if path2 != '':
-        label = pd.read_csv(path2, header=header)
-        label = np.array(label, dtype=np.int32)
-        return data, label
-    return data
-
-
-def splitResult(path):
+def splitResult(path, dtype=np.float32):
     data = pd.read_csv(path)
-    data = np.array(data, dtype=np.float32)
-    return data
-
-
-def readListCSV(path: str) -> np.array:
-    data = pd.read_csv(path, header=None)
-    return np.squeeze(np.array(data))
-
+    data = np.array(data, dtype=dtype)
+    return data.squeeze()
 
 def preprocess(arr: np.ndarray, stds: np.ndarray, means: np.ndarray):
     arr = arr.T

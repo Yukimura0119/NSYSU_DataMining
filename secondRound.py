@@ -14,8 +14,8 @@ tst_labl = splitResultNoID(
     './Gene_Expression_DataSet/test_label.csv', dtype=str)
 true_labels = replace_data_label(tst_labl)
 
-uncertain = pd.read_csv('./Cache/uncertain.csv', header=None).squeeze()
-dnnPredict = pd.read_csv('./Cache/dnnPredict.csv', header=None).squeeze()
+uncertain = splitResult('./Cache/uncertain.csv', dtype=int)
+dnnPredict = splitResult('./Cache/dnnPredict.csv', dtype=int)
 #dnnPredict = np.full((true_labels.shape[0],), -1)
 
 print(tst_data.shape, centers.shape)
@@ -23,8 +23,8 @@ print(tst_labl.shape, true_labels.shape, dnnPredict.shape)
 
 pred_labels = myDBSCAN(tst_data, RADIUS, MINP)
 
-print(true_labels)
-print(pred_labels)
+# print(true_labels)
+# print(pred_labels)
 evalLabel(true_labels, dnnPredict, 'DNN')
 evalLabel(true_labels, pred_labels, 'DBSCAN')
 
@@ -45,19 +45,12 @@ for i in set(pred_labels):
     # print(*fit, sep='\n')
     # print(f'label set {i} = {rst[0]}')
 
-    # if idx.shape[0] > 2*MINP:
-    #     clstCenter = np.mean(tst_data[idx], axis=0)
-    #     centers = np.vstack((centers, clstCenter))
-    #     centerID.append(rst[0])
-
-# print(centerID, centers.shape)
 idx = np.argwhere(pred_labels == -1).squeeze()
 out = tst_data[idx]
 print(out.shape)
 for i, p in zip(idx, out):
     d = [np.linalg.norm(c-p) for c in centers]
-    closestC = centerID[np.argmin(d)]
-    dnnPredict[i] = closestC
+    dnnPredict[i] = centerID[np.argmin(d)]
 
 evalLabel(true_labels, dnnPredict, 'Final')
 # print(np.dstack((true_labels, dnnPredict)))

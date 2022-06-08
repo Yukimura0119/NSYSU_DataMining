@@ -5,7 +5,6 @@ from util import splitResult, splitResultNoID, replace_data_label
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
-
 PATH1 = './../Gene_Expression_DataSet/reduced_train_data_32.csv'
 PATH2 = './../Gene_Expression_DataSet/train_label.csv'
 

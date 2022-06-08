@@ -9,10 +9,10 @@ from dbscan import *
 
 absFilePath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(absFilePath))
+
 DIM, EPS = 20, 60
-PATH1 = './Gene_Expression_DataSet/train_data.csv'
-PATH2 = './Gene_Expression_DataSet/train_label.csv'
-RESULT = './result/'
+PATH1 = './../Gene_Expression_DataSet/train_data.csv'
+PATH2 = './../Gene_Expression_DataSet/train_label.csv'
 
 std_mean = pd.read_csv('./std_mean.csv')
 trn_data = splitResultNoID(PATH1)

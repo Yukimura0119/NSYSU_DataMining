@@ -10,7 +10,7 @@ from Util.util import *
 from dbscan import *
 
 EPS = 1E-15
-STANDARD = 0.125
+STANDARD = 0.1
 MODEL_NAME = 'VeryGood.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,12 +81,9 @@ print(
     f'Recall(for unknown class): {100*true_predict/(test_data.shape[0]-total):.4f} %')
 print(f'Accuracy(for unknown class): {100*true_predict/all_predict:.4f} %')
 
-with open('./Cache/uncertain.csv', 'w', newline='') as csv_uncertain:
-    writer = csv.writer(csv_uncertain)
-    writer.writerow(np.argwhere(entro > STANDARD).squeeze())
-
-with open('./Cache/dnnPredict.csv', 'w', newline='') as csv_predictLabels:
-    writer = csv.writer(csv_predictLabels)
-    writer.writerow(predictLabels)
+df = pd.DataFrame(data=uncertain)
+df.to_csv('./Cache/uncertain.csv', index=False)
+df = pd.DataFrame(data=predictLabels)
+df.to_csv('./Cache/dnnPredict.csv', index=False)
 
 plt.show()
