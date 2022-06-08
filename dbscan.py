@@ -5,10 +5,10 @@ from collections import Counter
 from sklearn.datasets import make_blobs
 from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
 
-MAX, DIM, EPS = 120, 2, 1.4
+MAX, DIM, EPS = 400, 2, 20
 UNCLASSIFIED = 0
 NOISE = -1
-colorset = {-1: 'r', 0:'k', 1:'g', 2:'b', 3:'r', 4:'c', 5:'m'}
+colorset = 'gg'*10
 
 def _dist(p, q):
 	return np.power(p-q, 2).sum()
@@ -44,10 +44,11 @@ def _expand_cluster(m, _labels, curPoint, cluster_id, eps, min_points):
                         _labels[result_point] = cluster_id
                         
             plt.plot(m[current_point, 0], poi[current_point, 1], colorset[_labels[current_point]]+'.')
-            ax.add_patch(plt.Circle(tuple(m[current_point]), EPS, color=colorset[_labels[current_point]], alpha=0.05, fill=True))
-            plt.pause(0.01)
+            ax.add_patch(plt.Circle(tuple(m[current_point]), EPS//2, color=colorset[_labels[current_point]], alpha=0.03, fill=True))
             curRegion = curRegion[1:]
-        # plt.draw()
+            plt.pause(0.005)
+        
+        plt.draw()
         return True
 
 def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> np.array:
@@ -74,23 +75,25 @@ def myDBSCAN(m: np.ndarray, eps: float, min_points: int) -> np.array:
     return pointLabels
 
 if __name__== "__main__" :
-    
-    poi, true_labels = make_blobs(MAX, DIM, centers=4)
+    from PIL import Image
+    image = Image.open("./Util/thanks.png") # open colour image
+    image = np.array(image.convert('1')) # convert image to black and white
+    poi = np.argwhere(image==0)
+    print(poi.shape)
+    poi = poi[::23]
+    print(poi.shape)
+    # poi, true_labels = make_blobs(MAX, DIM, centers=4)
     global ax
     ax = plt.gca()
     ax.set_aspect('equal', adjustable='datalim')
 
-    plt.grid(color='k', linestyle='-', linewidth=0.5)
+    plt.grid(color='k', linestyle='-.', linewidth=0.5)
     plt.scatter(poi[:, 0], poi[:, 1], s=2, c='k')
     plt.pause(4)
     # for p in poi:
     #     ax.add_patch(plt.Circle(tuple(p), EPS, color='k', alpha=0.1, fill=False))
-    labels = myDBSCAN(poi, EPS, 8)
+    labels = myDBSCAN(poi, EPS, 13)
     print(dict(Counter(labels)))
-    print("Homogeneity: %0.3f" % homogeneity_score(true_labels, labels))
-    print("Completeness: %0.3f" % completeness_score(true_labels, labels))
-    print("V-measure: %0.3f" % v_measure_score(true_labels, labels))
-
     # plt.scatter(poi[:, 0], poi[:, 1], s=4, c=[colorset[i]for i in labels])
     
     plt.show()
