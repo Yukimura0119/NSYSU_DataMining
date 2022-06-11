@@ -7,7 +7,7 @@ import csv
 
 from models.Network import Net
 from Util.util import *
-from dbscan import *
+from Util.dbscan import *
 
 EPS = 1E-15
 STANDARD = 0.1

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics.cluster import completeness_score, homogeneity_score, v_measure_score
-
+from sklearn.datasets import make_blobs
 
 def splitResultNoID(path: str, dtype=np.float32):
     data = pd.read_csv(path)

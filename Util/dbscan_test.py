@@ -1,10 +1,7 @@
 import numpy as np
 from dbscan import *
-from Util.util import *
+from util import *
 from sklearn.cluster import DBSCAN
-from sklearn.datasets import make_blobs
-from collections import Counter
-from pandas.plotting import scatter_matrix
 import matplotlib.pyplot as plt
 
 

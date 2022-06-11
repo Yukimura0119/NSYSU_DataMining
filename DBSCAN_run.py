@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from dbscan import *
+from Util.dbscan import *
 from Util.util import *
 
 RADIUS, MINP = 60, 6
