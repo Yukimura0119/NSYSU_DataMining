@@ -11,7 +11,7 @@ from dbscan import *
 
 EPS = 1E-15
 STANDARD = 0.1
-MODEL_NAME = 'VeryGood.pth'
+MODEL_NAME = 'classifier.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

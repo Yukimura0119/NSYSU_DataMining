@@ -9,7 +9,7 @@ from dbscan import *
 
 STANDARD = 0.125
 RADIUS, MINP = 60, 6
-MODEL_NAME = 'VeryGood.pth'
+MODEL_NAME = 'classifier.pth'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
